@@ -54,7 +54,7 @@ run_git_sync() {
 
   if [[ "$run_poetry" == "true" ]]; then
     log "Running poetry update"
-    poetry update
+    poetry update || warn "Poetry update failed in $(basename "$dir"), continuing with git sync"
   fi
 
   if [[ -n "$(git status --porcelain)" ]]; then
