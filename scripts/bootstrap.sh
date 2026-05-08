@@ -26,7 +26,7 @@ if [[ -r /dev/tty ]]; then TTY=/dev/tty; else TTY=; fi
 ask_path() {
   local prompt="$1" default="$2" reply
   if [[ -z "$TTY" ]]; then REPLY="$default"; return; fi
-  printf '%s [%s]: ' "$prompt" "$default" >&2
+  printf '%s\n  Press Enter for: %s\n  Or type a path: ' "$prompt" "$default" >&2
   read -r reply <"$TTY" || reply=""
   REPLY="${reply:-$default}"
 }
@@ -61,8 +61,9 @@ if command -v devpod >/dev/null 2>&1; then
   fi
 fi
 
-echo "▶ Workspace root: $ROOT"
 mkdir -p "$ROOT"
+ROOT="$(cd "$ROOT" && pwd)"   # resolve to absolute so relative inputs work
+echo "▶ Workspace root: $ROOT"
 cd "$ROOT"
 
 if [[ ! -d "$INFRA_NAME/.git" ]]; then

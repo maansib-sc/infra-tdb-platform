@@ -30,4 +30,23 @@ fi
 echo "▶ Generating .vscode/launch.json from sibling debugpy ports"
 make debug-config || echo "⚠ debug-config skipped (no debugpy ports detected)"
 
+echo "▶ Generating multi-root workspace file"
+WORKSPACE_FILE="$WORKSPACE/talkingdb.code-workspace"
+{
+  echo '{'
+  echo '  "folders": ['
+  first=1
+  for dir in "$WORKSPACE"/*/; do
+    name="$(basename "$dir")"
+    [[ -d "$dir/.git" ]] || continue
+    if [[ $first -eq 1 ]]; then first=0; else echo ','; fi
+    printf '    { "path": "%s" }' "$name"
+  done
+  echo
+  echo '  ],'
+  echo '  "settings": {}'
+  echo '}'
+} > "$WORKSPACE_FILE"
+echo "  → $WORKSPACE_FILE"
+
 echo "✔ Workspace ready. Run 'make local' from $INFRA_DIR to start the platform."
