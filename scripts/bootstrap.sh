@@ -12,12 +12,13 @@
 # Non-interactive overrides (skip prompts):
 #   TDB_ROOT=/some/path           # workspace location
 #   TDB_AUTO_DEVPOD=Y|N           # whether to launch DevPod at the end
+#   TDB_INFRA_REPO=<git url>      # alternate infra repo source (e.g. a fork)
 #
 # Idempotent: re-running skips repos that already exist.
 
 set -euo pipefail
 
-INFRA_REPO="https://github.com/TalkingDB/infra-tdb-platform.git"
+INFRA_REPO="${TDB_INFRA_REPO:-https://github.com/TalkingDB/infra-tdb-platform.git}"
 INFRA_NAME="infra-tdb-platform"
 DEFAULT_ROOT="$PWD/TalkingDB"
 
