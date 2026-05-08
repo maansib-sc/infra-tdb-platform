@@ -383,8 +383,8 @@ if [[ "$cmd" == "local" ]]; then
     exit 1
   fi
 
-  ok "Local services started."
-  tail_all_logs_parallel
+  ok "Local services started. Streaming output (Ctrl+C to stop)..."
+  wait "${LOCAL_PIDS[@]}"
   exit 0
 fi
 
