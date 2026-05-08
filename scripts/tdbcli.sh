@@ -56,10 +56,11 @@ fi
 LOCAL_DIR="$REPO_ROOT/scripts"
 
 usage() {
-  echo "Usage: tdbcli {sync|deploy|add|rlog|cmd} [args...]"
+  echo "Usage: tdbcli {sync|push|deploy|add|rlog|cmd} [args...]"
   echo
   echo "Commands:"
-  echo "  sync           Run scripts/sync_git.sh"
+  echo "  sync           Sync local packages (commit only)"
+  echo "  push           Push all local packages"
   echo "  deploy         Run scripts/deploy.sh"
   echo "  add            Run scripts/add_dep.sh"
   echo "  rlog           Run scripts/reset_logs.sh (sudo)"
@@ -81,6 +82,9 @@ case "$COMMAND" in
     ;;
   sync)
     bash "$LOCAL_DIR/sync_git.sh" "$@"
+    ;;
+  push)
+    bash "$LOCAL_DIR/push_git.sh" "$@"
     ;;
   deploy)
     bash "$LOCAL_DIR/deploy.sh" "$@"

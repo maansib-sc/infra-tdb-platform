@@ -2,7 +2,8 @@
 
 set -e
 
-COMMIT_MSG="${1:-sync}"
+SYNC_MODE="${1:-git}"
+PYTHON_BIN="${PYTHON_BIN:-python3.12}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
@@ -42,10 +43,30 @@ run_git_sync() {
 
   log "Processing $(basename "$dir")"
 
+  # Fetch all remotes
+  log "Fetching all remotes"
+  git fetch --all --prune --quiet || warn "Fetch failed in $(basename "$dir"), continuing"
+
+  # Pull latest changes (skips if detached / no upstream / dirty)
+  if [[ -n "$(git status --porcelain)" ]]; then
+    warn "Uncommitted changes in $(basename "$dir"), skipping pull"
+  else
+    local branch
+    branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+    if [[ -z "$branch" ]]; then
+      warn "Detached HEAD in $(basename "$dir"), skipping pull"
+    elif ! git rev-parse --abbrev-ref "${branch}@{u}" >/dev/null 2>&1; then
+      warn "No upstream for $branch in $(basename "$dir"), skipping pull"
+    else
+      log "Pulling latest on $branch"
+      git pull --ff-only --quiet || warn "Pull failed in $(basename "$dir"), continuing"
+    fi
+  fi
+
   if [[ "$run_make_sync" == "true" ]]; then
     if make -q sync 2>/dev/null || make -n sync >/dev/null 2>&1; then
-      log "Running make sync"
-      make sync
+      log "Running make sync MODE=$SYNC_MODE"
+      make sync MODE="$SYNC_MODE"
     else
       warn "No 'sync' target in $(basename "$dir"), skipping"
     fi
@@ -53,24 +74,27 @@ run_git_sync() {
 
 
   if [[ "$run_poetry" == "true" ]]; then
-    log "Running poetry update"
-    poetry update || warn "Poetry update failed in $(basename "$dir"), continuing with git sync"
-  fi
+    if command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+      poetry env use "$PYTHON_BIN" >/dev/null 2>&1 || warn "poetry env use $PYTHON_BIN failed in $(basename "$dir")"
+    else
+      warn "$PYTHON_BIN not found on PATH; poetry will auto-select an interpreter"
+    fi
 
-  if [[ -n "$(git status --porcelain)" ]]; then
-    log "Git changes detected, committing"
-    git add .
-    git commit -m "$COMMIT_MSG"
-    git push
-    success "Pushed $(basename "$dir")"
-  else
-    warn "No changes to commit in $(basename "$dir")"
+    if [[ "$SYNC_MODE" == "local" ]]; then
+      log "Running poetry lock + install (local mode)"
+      poetry lock || warn "Poetry lock failed in $(basename "$dir"), continuing"
+      poetry install --no-root || warn "Poetry install failed in $(basename "$dir"), continuing"
+    else
+      log "Running poetry update"
+      poetry update || warn "Poetry update failed in $(basename "$dir"), continuing"
+    fi
   fi
 
   echo
 }
 
 echo -e "${BOLD}${BLUE}Root directory:${RESET} $ROOT_DIR"
+echo -e "${BOLD}${BLUE}Sync mode:${RESET} $SYNC_MODE"
 echo
 
 cd "$ROOT_DIR"

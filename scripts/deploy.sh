@@ -87,7 +87,7 @@ run_make() {
   local dir="$1" pkg="$2" target="$3"
   (
     cd "$dir"
-    echo "[$(date -Is)] make $target" | prefix_stream "$pkg"
+    echo "[$(date '+%Y-%m-%dT%H:%M:%S')] make $target" | prefix_stream "$pkg"
     make "$target" 2>&1 | prefix_stream "$pkg"
   )
 }
@@ -170,9 +170,10 @@ kill_dev_processes() {
   local TIMEOUT=10
 
   info "Discovering running dev processes..."
-  mapfile -t PIDS < <(
-    ps -eo pid=,cmd= | grep "$PATTERN" | grep -v grep | awk '{print $1}'
-  )
+  PIDS=()
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] && PIDS+=("$pid")
+  done < <(ps -eo pid=,cmd= | grep "$PATTERN" | grep -v grep | awk '{print $1}')
 
   if [[ "${#PIDS[@]}" -eq 0 ]]; then
     ok "No matching dev processes found."
@@ -184,7 +185,10 @@ kill_dev_processes() {
 
   for ((i=1; i<=TIMEOUT; i++)); do
     sleep 1
-    mapfile -t STILL < <(ps -p "${PIDS[@]}" -o pid= 2>/dev/null | xargs)
+    STILL=()
+    while IFS= read -r pid; do
+      [[ -n "$pid" ]] && STILL+=("$pid")
+    done < <(ps -p "${PIDS[@]}" -o pid= 2>/dev/null | xargs)
 
     if [[ "${#STILL[@]}" -eq 0 ]]; then
       ok "All dev processes exited gracefully."
@@ -202,7 +206,10 @@ kill_dev_processes() {
 info "Root directory: $ROOT_DIR"
 dim  "Mode: SEQUENTIAL start | LOCAL_SYNC=$LOCAL_SYNC | LOCAL_STRICT=$LOCAL_STRICT | LOCAL_SYNC_STRICT=$LOCAL_SYNC_STRICT"
 
-mapfile -t PKG_DIRS < <(list_packages)
+PKG_DIRS=()
+while IFS= read -r d; do
+  [[ -n "$d" ]] && PKG_DIRS+=("$d")
+done < <(list_packages)
 TOTAL="${#PKG_DIRS[@]}"
 
 if [[ "$cmd" == "up" ]]; then
@@ -352,8 +359,15 @@ if [[ "$cmd" == "local" ]]; then
     done
   }
 
-  mapfile -t PACKAGE_DIRS < <(list_package_dirs)
-  mapfile -t MODULE_DIRS  < <(list_module_dirs)
+  PACKAGE_DIRS=()
+  while IFS= read -r d; do
+    [[ -n "$d" ]] && PACKAGE_DIRS+=("$d")
+  done < <(list_package_dirs)
+
+  MODULE_DIRS=()
+  while IFS= read -r d; do
+    [[ -n "$d" ]] && MODULE_DIRS+=("$d")
+  done < <(list_module_dirs)
 
   # 1️⃣ Start packages
   start_local_group "packages" "${PACKAGE_DIRS[@]}"
@@ -369,8 +383,8 @@ if [[ "$cmd" == "local" ]]; then
     exit 1
   fi
 
-  ok "Local services started."
-  tail_all_logs_parallel
+  ok "Local services started. Streaming output (Ctrl+C to stop)..."
+  wait "${LOCAL_PIDS[@]}"
   exit 0
 fi
 

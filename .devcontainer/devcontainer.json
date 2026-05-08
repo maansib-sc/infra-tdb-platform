@@ -1,0 +1,44 @@
+{
+  "name": "TalkingDB Contributor",
+
+  "build": {
+    "dockerfile": "Dockerfile.dev",
+    "args": {
+      "POETRY_VERSION": "2.0.1",
+      "YQ_VERSION": "v4.44.3"
+    }
+  },
+
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+
+  "forwardPorts": [8090, 8091, 5690],
+  "portsAttributes": {
+    "8090": { "label": "TalkingDB API",        "onAutoForward": "notify" },
+    "8091": { "label": "Content Elementizer",  "onAutoForward": "silent" },
+    "5690": { "label": "debugpy",              "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "remoteUser": "vscode",
+
+  "postCreateCommand": "bash infra-tdb-platform/.devcontainer/post-create.sh"
+}

@@ -5,6 +5,7 @@ ENV ?= dev
 
 LOCAL_DEPLOY_SCRIPT = scripts/deploy.sh
 LOCAL_SYNC_SCRIPT = scripts/sync_git.sh
+LOCAL_PUSH_SCRIPT = scripts/push_git.sh
 
 .DEFAULT_GOAL := help
 .PHONY: help local local-up local-down local-status infra-up tdbcli-install tdbcli-uninstall tdbcli-install-user
@@ -24,17 +25,22 @@ help:
 	@echo "--------------------------"
 	@echo "Local:"
 	@echo "  make local                 Deploy local packages"
-	@echo "  make sync                  Sync local packages"
+	@echo "  make sync [mode=local|git] Sync local packages"
+	@echo "  make push                  Push all local packages"
 	@echo ""
 
 
 local:
 	@echo "Deploying Local packages"
-	bash $(LOCAL_DEPLOY_SCRIPT) up
+	bash $(LOCAL_DEPLOY_SCRIPT) local
 
 sync:
-	@echo "Syncing Local packages"
-	bash $(LOCAL_SYNC_SCRIPT)
+	@echo "Syncing Local packages (mode=$(or $(mode),git))"
+	bash $(LOCAL_SYNC_SCRIPT) $(or $(mode),git)
+
+push:
+	@echo "Pushing Local packages"
+	bash $(LOCAL_PUSH_SCRIPT)
 
 logs:
 	@echo "Tailing Local package logs"
