@@ -40,5 +40,5 @@
 
   "remoteUser": "vscode",
 
-  "postCreateCommand": "bash infra-tdb-platform/.devcontainer/post-create.sh"
+  "postCreateCommand": "bash -c 'sed -i \"s/\\r$//\" infra-tdb-platform/.devcontainer/post-create.sh; bash infra-tdb-platform/.devcontainer/post-create.sh'"
 }

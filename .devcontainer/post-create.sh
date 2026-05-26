@@ -7,6 +7,23 @@ INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 WORKSPACE="$(cd "$INFRA_DIR/.." && pwd)"
 MODULE_DIR="$WORKSPACE/module-talkingdb"
 
+echo "▶ Trusting sibling repos in the workspace (WSL2 bind-mount ownership mismatch)"
+for repo_git in "$WORKSPACE"/*/.git; do
+  [[ -d "$repo_git" ]] && git config --global --add safe.directory "$(dirname "$repo_git")" || true
+done
+
+echo "▶ Stripping CRLF from shell scripts, Makefiles, and env files across workspace"
+find "$WORKSPACE" -type f \( -name "*.sh" -o -name "Makefile" -o -name ".env" -o -name ".env.*" -o -name "env_example.sh" \) \
+  -not -path "*/.git/*" \
+  -not -path "*/.venv/*" \
+  -not -path "*/node_modules/*" \
+  -exec sed -i 's/\r$//' {} + 2>/dev/null || true
+
+echo "▶ Disabling filemode tracking on sibling repos (NTFS bind mounts can't chmod)"
+for repo_git in "$WORKSPACE"/*/.git; do
+  [[ -d "$repo_git" ]] && git -C "$(dirname "$repo_git")" config core.filemode false || true
+done
+
 cd "$INFRA_DIR"
 
 echo "▶ Cloning sibling repositories listed in local/repo.yaml"
