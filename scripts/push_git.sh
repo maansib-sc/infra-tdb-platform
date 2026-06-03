@@ -1,9 +1,13 @@
-set -e
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
 
 COMMIT_MSG="${1:-sync}"
-
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
+# ─────────────────────────────────────────────────────────────
+# Colors
+# ─────────────────────────────────────────────────────────────
 RESET="\033[0m"
 BOLD="\033[1m"
 GREEN="\033[32m"
@@ -12,30 +16,46 @@ BLUE="\033[34m"
 RED="\033[31m"
 CYAN="\033[36m"
 
-log() {
-  echo -e "${BOLD}${CYAN}▶ $1${RESET}"
-}
+log()     { echo -e "${BOLD}${CYAN}▶ $1${RESET}"; }
+success() { echo -e "${GREEN}✔ $1${RESET}"; }
+warn()    { echo -e "${YELLOW}⚠ $1${RESET}"; }
+error()   { echo -e "${RED}✖ $1${RESET}"; }
 
-success() {
-  echo -e "${GREEN}✔ $1${RESET}"
-}
+trap 'error "Failed at line $LINENO"' ERR
 
-warn() {
-  echo -e "${YELLOW}⚠ $1${RESET}"
-}
+run_pre_sync() {
+  local dir="$1"
 
-error() {
-  echo -e "${RED}✖ $1${RESET}"
+  cd "$dir"
+
+  if [[ -f "Makefile" ]] && grep -q "^sync:" Makefile; then
+    log "Running make sync"
+    make sync
+  fi
+
+  if [[ -f "pyproject.toml" ]] && command -v poetry >/dev/null 2>&1; then
+    log "Running poetry update"
+    poetry update
+  fi
 }
 
 push_repo() {
   local dir="$1"
 
-  cd "$dir" || return
+  cd "$dir"
 
   log "Processing $(basename "$dir")"
 
-  # Stage and commit any uncommitted changes
+  # skip non-git dirs
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    warn "Not a git repo, skipping"
+    return
+  fi
+
+  # run optional sync/update
+  run_pre_sync "$dir"
+
+  # commit if needed
   if [[ -n "$(git status --porcelain)" ]]; then
     log "Git changes detected, committing"
     git add .
@@ -43,15 +63,22 @@ push_repo() {
     success "Committed $(basename "$dir")"
   fi
 
-  # Push if there are unpushed commits
-  local ahead
-  ahead=$(git rev-list --count @{u}..HEAD 2>/dev/null || echo "unknown")
+  local branch
+  branch="$(git branch --show-current)"
 
-  if [[ "$ahead" == "unknown" ]]; then
-    warn "No upstream set for $(basename "$dir"), pushing with -u"
-    git push -u origin "$(git branch --show-current)"
+  # no upstream
+  if ! git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
+    warn "No upstream set, pushing with -u"
+    git push -u origin "$branch"
     success "Pushed $(basename "$dir")"
-  elif [[ "$ahead" -gt 0 ]]; then
+    echo
+    return
+  fi
+
+  local ahead
+  ahead="$(git rev-list --count @{u}..HEAD)"
+
+  if (( ahead > 0 )); then
     log "$ahead commit(s) ahead, pushing"
     git push
     success "Pushed $(basename "$dir")"
@@ -67,36 +94,27 @@ echo
 
 cd "$ROOT_DIR"
 
-# ─────────────────────────────────────────────────────────────
-# 1. base-tdb-models & base-tdb-clients
-# ─────────────────────────────────────────────────────────────
-if [[ -d "$ROOT_DIR/base-tdb-models" ]]; then
-  push_repo "$ROOT_DIR/base-tdb-models"
-fi
+# ordered explicit repos first
+PRIORITY_REPOS=(
+  "base-tdb-models"
+  "base-tdb-clients"
+  "base-tdb-helpers"
+)
 
-if [[ -d "$ROOT_DIR/base-tdb-clients" ]]; then
-  push_repo "$ROOT_DIR/base-tdb-clients"
-fi
+for repo in "${PRIORITY_REPOS[@]}"; do
+  [[ -d "$ROOT_DIR/$repo" ]] && push_repo "$ROOT_DIR/$repo"
+done
 
-# ─────────────────────────────────────────────────────────────
-# 2. base-tdb-helpers
-# ─────────────────────────────────────────────────────────────
-if [[ -d "$ROOT_DIR/base-tdb-helpers" ]]; then
-  push_repo "$ROOT_DIR/base-tdb-helpers"
-fi
-
-# ─────────────────────────────────────────────────────────────
-# 3. package-*
-# ─────────────────────────────────────────────────────────────
+# all package-* repos
 for dir in "$ROOT_DIR"/package-*; do
-  [[ -d "$dir" ]] && push_repo "$dir"
+  [[ -d "$dir" ]] || continue
+  push_repo "$dir"
 done
 
-# ─────────────────────────────────────────────────────────────
-# 4. module-*
-# ─────────────────────────────────────────────────────────────
+# all module-* repos
 for dir in "$ROOT_DIR"/module-*; do
-  [[ -d "$dir" ]] && push_repo "$dir"
+  [[ -d "$dir" ]] || continue
+  push_repo "$dir"
 done
 
-success "All repositories pushed successfully"
+success "All repositories processed successfully 🚀"
