@@ -10,7 +10,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --certificatesresolvers.le.acme.email=admin@talkingdb.io
+      - --certificatesresolvers.le.acme.email=mayank.g@smarter.codes
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.tlschallenge=true
       - --log.level=INFO
@@ -22,7 +22,7 @@ services:
       - ./letsencrypt:/letsencrypt
 
   ttt-backend:
-    image: us-central1-docker.pkg.dev/talkingdb-40099/tdb/module-talkingdb:${TTT_IMAGE_TAG:-latest}
+    image: us-central1-docker.pkg.dev/smarter-codes-website/tdb/module-talkingdb
     container_name: ttt-backend
     restart: unless-stopped
     env_file: ./ttt-backend.env
