@@ -44,15 +44,14 @@ def commit_if_needed(repo_path, msg):
 
 
 def run_sync_logic(repo_path):
-    """
-    Hook point for YOUR TOML logic
-    """
+    sync_script = Path(__file__).resolve().parent / "sync_git_deps.py"
+
     run([
         "python",
-        "sync_git_deps.py",
+        str(sync_script),
         "--mode",
         "git"
-    ])
+    ], cwd=repo_path)
 
 
 def process_repo(url):
