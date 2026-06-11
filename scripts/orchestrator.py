@@ -54,37 +54,34 @@ def run_sync_logic(repo_path):
     ], cwd=repo_path)
 
 
-def process_repo(url):
-    name = extract_name(url)
-
-    print(f"\n========== {name} ==========")
-
+def process_repos(repos):
     with tempfile.TemporaryDirectory() as tmp:
-        repo_path = Path(tmp) / name
-
-        git_clone(url, repo_path)
-
-        # ensure git identity in CI
-        run(["git", "config", "user.name", "github-actions[bot]"], cwd=repo_path)
-        run(["git", "config", "user.email", "github-actions[bot]@users.noreply.github.com"], cwd=repo_path)
-
-        # STEP 1: sync dependencies
-        try:
-            run_sync_logic(repo_path)
-        except:
-            pass
-
-        # STEP 2: commit if needed
-        committed = commit_if_needed(repo_path, f"chore: sync deps ({name})")
-
-        print(f"{name}: {'updated' if committed else 'no changes'}")
+        for url in repos:
+            name = extract_name(url)
+            print(f"\n========== {name} ==========")
+            
+            repo_path = Path(tmp) / name
+            git_clone(url, repo_path)
+    
+            # ensure git identity in CI
+            run(["git", "config", "user.name", "github-actions[bot]"], cwd=repo_path)
+            run(["git", "config", "user.email", "github-actions[bot]@users.noreply.github.com"], cwd=repo_path)
+    
+            # STEP 1: sync dependencies
+            try:
+                run_sync_logic(repo_path)
+            except:
+                pass
+    
+            # STEP 2: commit if needed
+            committed = commit_if_needed(repo_path, f"chore: sync deps ({name})")
+    
+            print(f"{name}: {'updated' if committed else 'no changes'}")
 
 
 def main():
     repos = load_repos()
-
-    for url in repos:
-        process_repo(url)
+    process_repos(repos)
 
 
 if __name__ == "__main__":
