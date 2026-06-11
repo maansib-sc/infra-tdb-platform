@@ -1,0 +1,25 @@
+name: TalkingDB Repo Orchestrator
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install pyyaml tomli tomli-w
+
+      - name: Run orchestrator
+        run: python scripts/orchestrator.py
