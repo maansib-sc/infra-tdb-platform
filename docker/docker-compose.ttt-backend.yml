@@ -1,0 +1,50 @@
+services:
+  traefik:
+    image: traefik:v3.6.4
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.le.acme.email=mayank.g@smarter.codes
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --log.level=INFO
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+  ttt-backend:
+    image: us-central1-docker.pkg.dev/smarter-codes-website/tdb/module-talkingdb
+    container_name: ttt-backend
+    restart: unless-stopped
+    env_file: ./ttt-backend.env
+    volumes:
+      - ./data:/app/data
+      - tdb-spool:/var/tmp/tdb-spool
+    command:
+      - poetry
+      - run
+      - uvicorn
+      - app.main:app
+      - --host=0.0.0.0
+      - --port=8090
+      - --workers=2
+      - --loop=uvloop
+      - --http=httptools
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ttt-backend.rule=Host(`${TTT_BACKEND_HOST}`)
+      - traefik.http.routers.ttt-backend.entrypoints=websecure
+      - traefik.http.routers.ttt-backend.tls.certresolver=le
+      - traefik.http.services.ttt-backend.loadbalancer.server.port=8090
+
+volumes:
+  tdb-spool:
