@@ -44,7 +44,7 @@ def commit_if_needed(repo_path, msg):
 
 
 def run_sync_logic(repo_path):
-    sync_script = Path(__file__).resolve().parent / "sync_git_deps.py"
+    sync_script = f"{repo_path}/sync_git_deps.py"
 
     run([
         "python",
