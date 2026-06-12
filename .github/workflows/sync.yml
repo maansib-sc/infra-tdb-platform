@@ -22,4 +22,6 @@ jobs:
         run: pip install pyyaml tomli tomli-w
 
       - name: Run orchestrator
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: python scripts/orchestrator.py
