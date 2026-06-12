@@ -50,10 +50,6 @@ def commit_if_needed(repo_path, msg):
 def run_sync_logic(repo_path):
     sync_script = f"{repo_path}/sync_git_deps.py"
 
-    if not sync_script.exists():
-        print("No sync script found, skipping")
-        return
-
     run([
         "python",
         str(sync_script),
