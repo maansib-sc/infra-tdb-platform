@@ -57,6 +57,43 @@ def run_sync_logic(repo_path):
         "git"
     ], cwd=repo_path)
 
+def run_docker_publish(repo_path, name):
+    repo_path = Path(repo_path)
+
+    gcp_project = os.getenv("GCP_PROJECT", "smarter-codes-website")
+    artifact_repo = os.getenv("ARTIFACT_REPO", "tdb")
+    artifact_region = os.getenv("ARTIFACT_REGION", "us-central1")
+
+    registry_host = f"{artifact_region}-docker.pkg.dev"
+    remote_image = f"{registry_host}/{gcp_project}/{artifact_repo}/{name}"
+
+    current_commit = subprocess.check_output(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=repo_path
+    ).decode().strip()
+
+    tags = ["latest", current_commit]
+
+    print(f"🐳 Building image {name}")
+
+    run(["docker", "build", "-t", f"{name}:latest", "."], cwd=repo_path)
+
+    for tag in tags:
+        run([
+            "docker",
+            "tag",
+            f"{name}:latest",
+            f"{remote_image}:{tag}"
+        ])
+
+    for tag in tags:
+        run([
+            "docker",
+            "push",
+            f"{remote_image}:{tag}"
+        ])
+
+    print(f"✅ Pushed {name} -> {remote_image}")
 
 def process_repos(repos):
     with tempfile.TemporaryDirectory() as tmp:
@@ -80,6 +117,12 @@ def process_repos(repos):
     
             # STEP 2: commit if needed
             committed = commit_if_needed(repo_path, f"chore: sync deps ({name})")
+
+            # STEP 3: docker publish
+            try:
+                run_docker_publish(repo_path, name)
+            except:
+               pass
     
             print(f"{name}: {'updated' if committed else 'no changes'}")
 
