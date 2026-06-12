@@ -58,14 +58,11 @@ def run_sync_logic(repo_path):
     ], cwd=repo_path)
 
 def run_docker_publish(repo_path, name):
+    if 'module-talkingdb' not in name:
+        continue
+        
     repo_path = Path(repo_path)
-
-    gcp_project = os.getenv("GCP_PROJECT", "smarter-codes-website")
-    artifact_repo = os.getenv("ARTIFACT_REPO", "tdb")
-    artifact_region = os.getenv("ARTIFACT_REGION", "us-central1")
-
-    registry_host = f"{artifact_region}-docker.pkg.dev"
-    remote_image = f"{registry_host}/{gcp_project}/{artifact_repo}/{name}"
+    remote_image = f"talkingdb/ttt"
 
     current_commit = subprocess.check_output(
         ["git", "rev-parse", "--short", "HEAD"],
