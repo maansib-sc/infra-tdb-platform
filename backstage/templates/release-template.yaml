@@ -14,27 +14,15 @@ spec:
     - title: Branch Selection
 
       properties:
-        repoUrl:
-          title: Repository URL
-          type: string
-          default: github.com?owner=TalkingDB&repo=infra-tdb-platform
-
         base_tdb_models_branch:
           title: base-tdb-models Branch
           type: string
           default: main
           ui:field: RepoBranchPicker
           ui:options:
+            repoUrl: github.com?owner=TalkingDB&repo=base-tdb-models
             requestUserCredentials:
               secretsKey: USER_OAUTH_TOKEN
-
-    - title: Branch Selection
-
-      properties:
-        repoUrl:
-          title: Repository URL
-          type: string
-          default: github.com?owner=TalkingDB&repo=base-tdb-clients
 
         base_tdb_clients_branch:
           title: base-tdb-clients Branch
@@ -46,14 +34,6 @@ spec:
             requestUserCredentials:
               secretsKey: USER_OAUTH_TOKEN
 
-    - title: Branch Selection
-
-      properties:
-        repoUrl:
-          title: Repository URL
-          type: string
-          default: github.com?owner=TalkingDB&repo=base-tdb-helpers
-
         base_tdb_helpers_branch:
           title: base-tdb-helpers Branch
           type: string
@@ -64,14 +44,6 @@ spec:
             requestUserCredentials:
               secretsKey: USER_OAUTH_TOKEN
 
-    - title: Branch Selection
-
-      properties:
-        repoUrl:
-          title: Repository URL
-          type: string
-          default: github.com?owner=TalkingDB&repo=package-content-elementizer
-
         package_content_elementizer_branch:
           title: package-content-elementizer Branch
           type: string
@@ -81,14 +53,6 @@ spec:
             repoUrl: github.com?owner=TalkingDB&repo=package-content-elementizer
             requestUserCredentials:
               secretsKey: USER_OAUTH_TOKEN
-
-    - title: Branch Selection
-
-      properties:
-        repoUrl:
-          title: Repository URL
-          type: string
-          default: github.com?owner=TalkingDB&repo=module-ttt
 
         module_ttt_branch:
           title: module-ttt Branch
