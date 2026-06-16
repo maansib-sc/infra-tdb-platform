@@ -2,6 +2,36 @@ name: TalkingDB Repo Orchestrator
 
 on:
   workflow_dispatch:
+    inputs:
+      host:
+        required: false
+        type: string
+        default: ""
+
+      repos_json:
+        required: false
+        type: string
+        default: ""
+
+      docker_module_ttt:
+        required: false
+        type: string
+        default: "true"
+
+      docker_elementizer:
+        required: false
+        type: string
+        default: "false"
+
+      module_ttt_tag:
+        required: false
+        type: string
+        default: ""
+
+      elementizer_tag:
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -13,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker Login to Docker Hub
+      - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -30,4 +60,10 @@ jobs:
       - name: Run orchestrator
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+          HOST: ${{ inputs.host }}
+          REPOS_JSON: ${{ inputs.repos_json }}
+          DOCKER_MODULE_TTT: ${{ inputs.docker_module_ttt }}
+          DOCKER_ELEMENTIZER: ${{ inputs.docker_elementizer }}
+          MODULE_TTT_TAG: ${{ inputs.module_ttt_tag }}
+          ELEMENTIZER_TAG: ${{ inputs.elementizer_tag }}
         run: python scripts/orchestrator.py

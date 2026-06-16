@@ -13,7 +13,6 @@ spec:
       required:
         - hostSubdomain
       properties:
-
         hostSubdomain:
           type: string
           title: Host Subdomain
@@ -46,7 +45,6 @@ spec:
 
     - title: Docker Configuration
       properties:
-
         docker_elementizer:
           type: boolean
           title: Build Docker for package-content-elementizer
@@ -73,23 +71,25 @@ spec:
       action: github:actions:dispatch
       input:
         repoUrl: github.com?repo=infra-tdb-platform&owner=TalkingDB
-        workflowId: release.yml
+        workflowId: sync.yml
         branchOrTagName: main
         workflowInputs:
-          host: ${{ parameters.hostSubdomain }}.talkingdb.io
+          host: "${{ parameters.hostSubdomain }}.talkingdb.io"
 
-          base_tdb_models_branch: ${{ parameters["base-tdb-models-branch"] }}
-          base_tdb_clients_branch: ${{ parameters["base-tdb-clients-branch"] }}
-          base_tdb_helpers_branch: ${{ parameters["base-tdb-helpers-branch"] }}
-          package_elementizer_branch: ${{ parameters["package-content-elementizer-branch"] }}
-          module_ttt_branch: ${{ parameters["module-ttt-branch"] }}
+          repos_json: >
+            [
+              { "url": "https://github.com/TalkingDB/base-tdb-models.git", "branch": "${{ parameters.base-tdb-models-branch }}" },
+              { "url": "https://github.com/TalkingDB/base-tdb-clients.git", "branch": "${{ parameters.base-tdb-clients-branch }}" },
+              { "url": "https://github.com/TalkingDB/base-tdb-helpers.git", "branch": "${{ parameters.base-tdb-helpers-branch }}" },
+              { "url": "https://github.com/TalkingDB/package-content-elementizer.git", "branch": "${{ parameters.package-content-elementizer-branch }}" },
+              { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": "${{ parameters.module-ttt-branch }}" },
+            ]
 
-          build_docker_elementizer: "${{ parameters.docker_elementizer ? 'true' : 'false' }}"
-          build_docker_module_ttt: "${{ parameters.docker_module_ttt ? 'true' : 'false' }}"
+          docker_module_ttt: "${{ parameters.docker_module_ttt }}"
+          docker_elementizer: "${{ parameters.docker_elementizer }}"
 
-          elementizer_tag: "${{ parameters.elementizer_tag || '' }}"
           module_ttt_tag: "${{ parameters.module_ttt_tag || '' }}"
-
+          elementizer_tag: "${{ parameters.elementizer_tag || '' }}"
   output:
     text:
       - title: Triggered

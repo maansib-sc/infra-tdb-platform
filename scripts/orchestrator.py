@@ -1,3 +1,4 @@
+import json
 import os
 import yaml
 import subprocess
@@ -6,6 +7,12 @@ from pathlib import Path
 
 REPOS_FILE = Path("local/repo.yaml")
 
+HOST = os.environ.get("HOST")
+DOCKER_MODULE_TTT = os.environ.get("DOCKER_MODULE_TTT", "false") == "true"
+DOCKER_ELEMENTIZER = os.environ.get("DOCKER_ELEMENTIZER", "false") == "true"
+
+MODULE_TTT_TAG = os.environ.get("MODULE_TTT_TAG", "")
+ELEMENTIZER_TAG = os.environ.get("ELEMENTIZER_TAG", "")
 
 def run(cmd, cwd=None):
     print(">", " ".join(cmd))
@@ -13,16 +20,22 @@ def run(cmd, cwd=None):
 
 
 def load_repos():
-    data = yaml.safe_load(REPOS_FILE.read_text())
-    return data["repos"]
+    try:
+        return json.loads(os.environ["REPOS_JSON"])
+    except:
+        data = yaml.safe_load(REPOS_FILE.read_text())
+        return [
+            {"url": d, "branch": "main"}
+            for d in data.get("repos", [])
+        ]
 
 
 def extract_name(url):
     return url.split("/")[-1].replace(".git", "")
 
 
-def git_clone(url, path):
-    run(["git", "clone", url, str(path)])
+def git_clone(url, branch, path):
+    run(["git", "clone", "-b", branch, url, str(path)])
 
 
 def set_git_auth(repo_path, url, token):
@@ -61,11 +74,18 @@ def run_sync_logic(repo_path):
 
 
 def run_docker_publish(repo_path, name):
-    if not name.startswith("module-"):
+    if not (name.startswith("module-") or name.startswith("package-")):
+        return
+    
+    if not DOCKER_MODULE_TTT and name == "module-ttt":
+        print(f"Skipping docker publish for {name} (DOCKER_MODULE_TTT is false)")
+        return
+    if not DOCKER_ELEMENTIZER and name == "package-content-elementizer":
+        print(f"Skipping docker publish for {name} (DOCKER_ELEMENTIZER is false)")
         return
 
     repo_path = Path(repo_path)
-    remote_image = f'talkingdb/{name.replace("module-", "")}'
+    remote_image = f'talkingdb/{name.replace("module-", "").replace("package-", "")}'
 
     current_commit = subprocess.check_output(
         ["git", "rev-parse", "--short", "HEAD"],
@@ -73,6 +93,11 @@ def run_docker_publish(repo_path, name):
     ).decode().strip()
 
     tags = ["latest", current_commit]
+    
+    if name == "module-ttt" and MODULE_TTT_TAG:
+        tags.append(MODULE_TTT_TAG)
+    if name == "package-content-elementizer" and ELEMENTIZER_TAG:
+        tags.append(ELEMENTIZER_TAG)
 
     print(f"🐳 Building image {name}")
 
@@ -98,12 +123,16 @@ def run_docker_publish(repo_path, name):
 
 def process_repos(repos):
     with tempfile.TemporaryDirectory() as tmp:
-        for url in repos:
+        for repo in repos:
+            url = repo["url"]
+            branch = repo.get("branch", "main")
+            
             name = extract_name(url)
             print(f"\n========== {name} ==========")
 
             repo_path = Path(tmp) / name
-            git_clone(url, repo_path)
+            
+            git_clone(url, branch, repo_path)
             set_git_auth(repo_path, url, os.environ["GH_PAT"])
 
             # ensure git identity in CI
