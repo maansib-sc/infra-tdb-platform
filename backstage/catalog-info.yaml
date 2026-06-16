@@ -1,0 +1,21 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: tdb-catalog
+spec:
+  targets:
+  - ./users/mayank-g.yaml
+  - ./groups/engineering.yaml
+  - ./domains/talkingdb.yaml
+  - ./domains/flowbot.yaml
+  - ./systems/talkingdb.yaml
+  - ./systems/flowbot.yaml
+  - ./components/infra-tdb-platform.yaml
+  - ./components/module-ttt.yaml
+  - ./components/package-content-elementizer.yaml
+  - ./components/base-tdb-helpers.yaml
+  - ./components/base-tdb-models.yaml
+  - ./components/base-tdb-clients.yaml
+  - ./components/sdk-talkingdb.yaml
+  - ./components/flowbot-framework.yaml
+  - ./components/flowbot-chatbot-ttt.yaml

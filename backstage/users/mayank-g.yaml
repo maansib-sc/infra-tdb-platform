@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: mayank.g
+spec:
+  profile:
+    displayName: Mayank Gupta
+    email: mayank.g@smarter.codes
+  memberOf:
+  - engineering
