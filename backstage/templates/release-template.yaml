@@ -79,7 +79,7 @@ spec:
               { "url": "https://github.com/TalkingDB/base-tdb-clients.git", "branch": '${{ parameters.base_tdb_clients_branch }}' },
               { "url": "https://github.com/TalkingDB/base-tdb-helpers.git", "branch": '${{ parameters.base_tdb_h_helpers_branch }}' },
               { "url": "https://github.com/TalkingDB/package-content-elementizer.git", "branch": '${{ parameters.package_content_elementizer_branch }}' },
-              { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": '${{ parameters.module_ttt_branch }}' },
+              { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": '${{ parameters.module_ttt_branch }}' }
             ]
 
           docker_module_ttt: ${{ parameters.docker_module_ttt | string }}

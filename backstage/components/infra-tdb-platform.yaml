@@ -2,6 +2,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: infra-tdb-platform
+  annotations:
+    github.com/project-slug: TalkingDB/infra-tdb-platform
 spec:
   type: service
   lifecycle: production
