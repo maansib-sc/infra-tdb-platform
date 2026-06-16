@@ -82,8 +82,8 @@ spec:
               { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": '${{ parameters.module_ttt_branch }}' },
             ]
 
-          docker_module_ttt: "${{ parameters.docker_module_ttt }}"
-          docker_elementizer: "${{ parameters.docker_elementizer }}"
+          docker_module_ttt: "'${{ parameters.docker_module_ttt }}'"
+          docker_elementizer: "'${{ parameters.docker_elementizer }}'"
 
           module_ttt_tag: ${{ parameters.module_ttt_tag }}
           elementizer_tag: ${{ parameters.elementizer_tag }}
