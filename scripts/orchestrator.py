@@ -65,7 +65,7 @@ def run_docker_publish(repo_path, name):
         return
 
     repo_path = Path(repo_path)
-    remote_image = f"talkingdb/{name.replace("module-", "")}"
+    remote_image = f'talkingdb/{name.replace("module-", "")}'
 
     current_commit = subprocess.check_output(
         ["git", "rev-parse", "--short", "HEAD"],
