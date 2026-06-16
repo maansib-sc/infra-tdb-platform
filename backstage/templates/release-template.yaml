@@ -71,23 +71,23 @@ spec:
         workflowId: sync.yml
         branchOrTagName: main
         workflowInputs:
-          host: ${{ parameters.host_domain  || ''}}
+          host: ${{ parameters.host_domain }}
 
           repos_json: >
             [
-              { "url": "https://github.com/TalkingDB/base-tdb-models.git", "branch": "${{ parameters.base_tdb_models_branch }}" },
-              { "url": "https://github.com/TalkingDB/base-tdb-clients.git", "branch": "${{ parameters.base_tdb_clients_branch }}" },
-              { "url": "https://github.com/TalkingDB/base-tdb-helpers.git", "branch": "${{ parameters.base_tdb_h helpers_branch }}" },
-              { "url": "https://github.com/TalkingDB/package-content-elementizer.git", "branch": "${{ parameters.package_content_elementizer_branch }}" },
-              { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": "${{ parameters.module_ttt_branch }}" },
+              { "url": "https://github.com/TalkingDB/base-tdb-models.git", "branch": ${{ parameters.base_tdb_models_branch }} },
+              { "url": "https://github.com/TalkingDB/base-tdb-clients.git", "branch": ${{ parameters.base_tdb_clients_branch }} },
+              { "url": "https://github.com/TalkingDB/base-tdb-helpers.git", "branch": ${{ parameters.base_tdb_h helpers_branch }} },
+              { "url": "https://github.com/TalkingDB/package-content-elementizer.git", "branch": ${{ parameters.package_content_elementizer_branch }} },
+              { "url": "https://github.com/TalkingDB/module-ttt.git", "branch": ${{ parameters.module_ttt_branch }} },
             ]
 
-          docker_module_ttt: ${{ parameters.docker_module_ttt && 'true' || 'false' }}
-          docker_elementizer: ${{ parameters.docker_elementizer && 'true' || 'false' }}
+          docker_module_ttt: ${{ parameters.docker_module_ttt }} && true || false
+          docker_elementizer: ${{ parameters.docker_elementizer }} && true || false
 
-          module_ttt_tag: ${{ parameters.module_ttt_tag || '' }}
-          elementizer_tag: ${{ parameters.elementizer_tag || '' }}"
+          module_ttt_tag: ${{ parameters.module_ttt_tag }} || ""
+          elementizer_tag: ${{ parameters.elementizer_tag }} || ""
   output:
     text:
       - title: Triggered
-        content: Release pipeline triggered for ${{ parameters.hostDomain }}
+        content: Release pipeline triggered for ${{ parameters.host_domain }}
