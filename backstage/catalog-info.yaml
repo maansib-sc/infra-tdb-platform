@@ -19,3 +19,4 @@ spec:
   - ./components/sdk-talkingdb.yaml
   - ./components/flowbot-framework.yaml
   - ./components/flowbot-chatbot-ttt.yaml
+  - ./templates/release-template.yaml
