@@ -42,31 +42,6 @@ spec:
     - title: Docker Builds
 
       properties:
-        docker_module_ttt:
-          type: boolean
-          title: Build module-ttt
-          default: true
-
-        module_ttt_tag_strategy:
-          title: module-ttt Tag Strategy
-          type: array
-          uniqueItems: true
-
-          items:
-            type: string
-            enum:
-              - latest
-              - commit
-              - custom
-
-          default:
-            - latest
-            - commit
-
-        module_ttt_custom_tag:
-          type: string
-          title: module-ttt Custom Tag
-
         docker_content_elementizer:
           type: boolean
           title: Build package-content-elementizer
@@ -76,49 +51,120 @@ spec:
           title: package-content-elementizer Tag Strategy
           type: array
           uniqueItems: true
-
           items:
             type: string
             enum:
               - latest
               - commit
               - custom
+          default:
+            - latest
 
-        content_elementizer_custom_tag:
-          type: string
-          title: package-content-elementizer Custom Tag
+        docker_module_ttt:
+          type: boolean
+          title: Build module-ttt
+          default: true
 
+        module_ttt_tag_strategy:
+          title: module-ttt Tag Strategy
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+              - latest
+              - commit
+              - custom
+          default:
+            - latest
+
+      dependencies:
+        content_elementizer_tag_strategy:
+          oneOf:
+            - properties:
+                content_elementizer_tag_strategy:
+                  contains:
+                    const: custom
+                content_elementizer_custom_tag:
+                  type: string
+                  title: package-content-elementizer Custom Tag
+              required:
+                - content_elementizer_custom_tag
+
+            - properties:
+                content_elementizer_tag_strategy:
+                  type: array
+
+        module_ttt_tag_strategy:
+          oneOf:
+            - properties:
+                module_ttt_tag_strategy:
+                  contains:
+                    const: custom
+                module_ttt_custom_tag:
+                  type: string
+                  title: module-ttt Custom Tag
+              required:
+                - module_ttt_custom_tag
+
+            - properties:
+                module_ttt_tag_strategy:
+                  type: array
     - title: Deployment Target
 
       properties:
         vm:
-          title: Target VM
+          title: Select VM
           type: string
           enum:
             - create-new
             - ttt-chat
-
           default: ttt-chat
 
-        new_vm_name:
-          type: string
-          title: New VM Name
-
         release:
-          title: Release
+          title: Select Release
           type: string
           enum:
             - create-new
             - rc1
             - rc2
             - rc3
-
           default: create-new
 
-        new_release_name:
-          type: string
-          title: New Release Name
+      dependencies:
+        vm:
+          oneOf:
+            - properties:
+                vm:
+                  const: create-new
+                new_vm_name:
+                  type: string
+                  title: New VM Name
+              required:
+                - new_vm_name
 
+            - properties:
+                vm:
+                  enum:
+                    - ttt-chat
+
+        release:
+          oneOf:
+            - properties:
+                release:
+                  const: create-new
+                new_release_name:
+                  type: string
+                  title: New Release Name
+              required:
+                - new_release_name
+
+            - properties:
+                release:
+                  enum:
+                    - rc1
+                    - rc2
+                    - rc3
     - title: Notifications
 
       properties:
