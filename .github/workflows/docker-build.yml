@@ -4,8 +4,8 @@ on:
   workflow_call:
     inputs:
       repos_json:
-        required: true
         type: string
+        default: ""
 
       docker_module_ttt:
         required: true

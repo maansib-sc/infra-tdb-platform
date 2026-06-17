@@ -5,6 +5,7 @@ on:
     inputs:
       repos_json:
         type: string
+        default: ""
 
 jobs:
   sync:

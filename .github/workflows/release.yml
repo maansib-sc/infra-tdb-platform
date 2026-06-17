@@ -21,6 +21,7 @@ on:
 
       repos_json:
         type: string
+        default: ""
 
       docker_module_ttt:
         type: string
