@@ -75,6 +75,8 @@ jobs:
     uses: ./.github/workflows/docker-build.yml
     secrets: inherit
     with:
+      repos_json: ${{ inputs.repos_json }}
+      
       docker_module_ttt: ${{ inputs.docker_module_ttt }}
       module_ttt_tag_strategy: ${{ inputs.module_ttt_tag_strategy }}
       module_ttt_custom_tag: ${{ inputs.module_ttt_custom_tag }}
