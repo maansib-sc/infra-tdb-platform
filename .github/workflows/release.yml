@@ -76,7 +76,7 @@ jobs:
     secrets: inherit
     with:
       repos_json: ${{ inputs.repos_json }}
-      
+
       docker_module_ttt: ${{ inputs.docker_module_ttt }}
       module_ttt_tag_strategy: ${{ inputs.module_ttt_tag_strategy }}
       module_ttt_custom_tag: ${{ inputs.module_ttt_custom_tag }}
@@ -94,6 +94,7 @@ jobs:
       new_vm_name: ${{ inputs.new_vm_name }}
       release: ${{ inputs.release }}
       new_release_name: ${{ inputs.new_release_name }}
+      repos_json: ${{ inputs.repos_json }}
 
   notify:
     needs: deploy
@@ -104,3 +105,5 @@ jobs:
       notify_teams: ${{ inputs.notify_teams }}
       notify_email: ${{ inputs.notify_email }}
       additional_recipients: ${{ inputs.additional_recipients }}
+      vm: ${{ inputs.vm }}
+      release: ${{ inputs.release }}
