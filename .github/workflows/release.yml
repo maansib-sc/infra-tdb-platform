@@ -94,7 +94,6 @@ jobs:
       new_vm_name: ${{ inputs.new_vm_name }}
       release: ${{ inputs.release }}
       new_release_name: ${{ inputs.new_release_name }}
-      repos_json: ${{ inputs.repos_json }}
 
   notify:
     needs: deploy
