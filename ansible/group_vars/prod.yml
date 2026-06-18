@@ -1,5 +1,6 @@
 ---
 # Production environment overrides.
 env_name: prod
-traefik_api_insecure: false
+traefik_dashboard_insecure: false
 traefik_dashboard_host: info.talkingdb.io
+ttt_backend_host: ttt.talkingdb.io

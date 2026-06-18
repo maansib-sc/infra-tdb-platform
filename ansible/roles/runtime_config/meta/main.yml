@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: runtime_config
+  author: TalkingDB
+  description: Render per-environment runtime configuration — the Traefik compose file and non-secret compose substitution env.
+  license: AGPL-3.0
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+dependencies: []

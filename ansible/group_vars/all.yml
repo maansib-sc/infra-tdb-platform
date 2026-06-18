@@ -5,6 +5,16 @@ service_group: talkingdb
 deploy_base_dir: /opt/talkingdb
 docker_network_name: talkingdb-net
 
+# Compose project directory on the VM (runtime_config + deploy_services write here).
+compose_dir: "{{ deploy_base_dir }}/compose"
+
+# Traefik image (non-secret, shared across environments).
+traefik_image: traefik:v3.6.4
+
+# TLS via Let's Encrypt is enabled in all deployed environments.
+traefik_tls_enabled: true
+traefik_acme_email: mayank.g@smarter.codes
+
 # Container registry (non-secret). Credentials are injected by the secrets role.
 docker_registry: docker.io
 

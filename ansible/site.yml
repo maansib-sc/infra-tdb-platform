@@ -8,3 +8,4 @@
     - common
     - docker_host
     - secrets
+    - runtime_config

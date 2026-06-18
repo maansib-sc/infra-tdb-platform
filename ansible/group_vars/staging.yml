@@ -1,5 +1,6 @@
 ---
 # Staging environment overrides.
 env_name: staging
-traefik_api_insecure: true
+traefik_dashboard_insecure: true
 traefik_dashboard_host: info.staging.talkingdb.io
+ttt_backend_host: ttt.staging.talkingdb.io

@@ -1,0 +1,33 @@
+---
+# Render per-environment runtime configuration: the Traefik compose file and
+# the non-secret compose substitution env file.
+
+- name: Ensure the compose directory exists
+  ansible.builtin.file:
+    path: "{{ compose_dir }}"
+    state: directory
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
+    mode: "0750"
+  become: true
+  tags: [runtime_config]
+
+- name: Render the Traefik compose file
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ compose_dir }}/traefik.yml"
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
+    mode: "0640"
+  become: true
+  tags: [runtime_config]
+
+- name: Render the compose substitution env file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ compose_dir }}/.env"
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
+    mode: "0640"
+  become: true
+  tags: [runtime_config]

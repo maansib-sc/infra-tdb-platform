@@ -1,0 +1,47 @@
+# Managed by Ansible (runtime_config) — per-environment Traefik configuration.
+services:
+  traefik:
+    image: {{ traefik_image }}
+    container_name: traefik
+    restart: unless-stopped
+    networks:
+      - {{ docker_network_name }}
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --log.level=INFO
+{% if traefik_tls_enabled | bool %}
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.le.acme.email={{ traefik_acme_email }}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+{% endif %}
+{% if traefik_dashboard_insecure | bool %}
+      - --api.dashboard=true
+{% endif %}
+{% if traefik_dashboard_insecure | bool %}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_dashboard_host }}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=le"
+{% endif %}
+    ports:
+      - "80:80"
+{% if traefik_tls_enabled | bool %}
+      - "443:443"
+{% endif %}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+{% if traefik_tls_enabled | bool %}
+      - {{ deploy_base_dir }}/letsencrypt:/letsencrypt
+{% endif %}
+
+networks:
+  {{ docker_network_name }}:
+    name: {{ docker_network_name }}
+    external: true
