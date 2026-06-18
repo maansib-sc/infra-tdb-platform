@@ -29,7 +29,7 @@ on:
 
       module_ttt_tag_strategy:
         type: string
-        default: '["latest","commit"]'
+        default: 'latest,commit,custom'
 
       module_ttt_custom_tag:
         type: string
@@ -41,7 +41,7 @@ on:
 
       content_elementizer_tag_strategy:
         type: string
-        default: '["latest","commit"]'
+        default: 'latest,commit,custom'
 
       content_elementizer_custom_tag:
         type: string
