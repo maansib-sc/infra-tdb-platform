@@ -9,3 +9,4 @@
     - docker_host
     - secrets
     - runtime_config
+    - deploy_services

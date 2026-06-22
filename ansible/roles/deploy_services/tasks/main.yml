@@ -1,0 +1,23 @@
+---
+# Render the module-ttt service compose file and bring up the stack
+# (Traefik + module-ttt). compose up recreates only changed services, so a
+# config/secret/image change triggers a restart without separate handlers.
+
+- name: Render the module-ttt compose file
+  ansible.builtin.template:
+    src: module-ttt.yml.j2
+    dest: "{{ compose_dir }}/module-ttt.yml"
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
+    mode: "0640"
+  become: true
+  tags: [deploy_services]
+
+- name: Deploy the stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ compose_dir }}"
+    files: "{{ deploy_services_compose_files }}"
+    state: present
+    pull: missing
+  become: true
+  tags: [deploy_services]

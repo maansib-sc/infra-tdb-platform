@@ -1,0 +1,5 @@
+---
+# Compose files (in compose_dir) that make up the running stack.
+deploy_services_compose_files:
+  - traefik.yml
+  - module-ttt.yml

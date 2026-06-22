@@ -18,6 +18,11 @@ traefik_acme_email: mayank.g@smarter.codes
 # Container registry (non-secret). Credentials are injected by the secrets role.
 docker_registry: docker.io
 
+# module-ttt image (deploy_services). The pipeline overrides the tag with the
+# git SHA per release; latest is only a local/standalone fallback.
+module_ttt_image: talkingdb/ttt
+module_ttt_image_tag: latest
+
 # Infisical workspace holding runtime secrets (non-secret identifier).
 infisical_workspace_id: a8820fc7-b5cc-45df-9e6a-bcd431fa59a3
 

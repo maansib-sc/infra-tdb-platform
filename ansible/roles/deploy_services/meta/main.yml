@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: deploy_services
+  author: TalkingDB
+  description: Render the application service compose files (SHA-pinned images) and bring up the stack with Docker Compose.
+  license: AGPL-3.0
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+dependencies: []
