@@ -1,0 +1,13 @@
+---
+# Poll cadence: retries x delay = max wait per target.
+healthcheck_retries: 12
+healthcheck_delay: 5
+
+# Endpoints to validate after a deploy. Overridable per environment.
+healthcheck_targets:
+  - name: module-ttt
+    url: "http://127.0.0.1:8090/"
+    status: [200]
+  - name: traefik
+    url: "http://127.0.0.1:80/"
+    status: [200, 301, 302, 404]

@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: healthcheck
+  author: TalkingDB
+  description: Poll deployed service endpoints with retries and fail the play on timeout.
+  license: AGPL-3.0
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+dependencies: []

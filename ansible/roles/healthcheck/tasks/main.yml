@@ -1,0 +1,19 @@
+---
+# Poll each service endpoint with retries; fail the play if any never becomes
+# healthy within retries x delay.
+
+- name: Wait for each service to report healthy
+  ansible.builtin.uri:
+    url: "{{ item.url }}"
+    method: GET
+    status_code: "{{ item.status }}"
+    follow_redirects: none
+    validate_certs: false
+  register: healthcheck_result
+  retries: "{{ healthcheck_retries }}"
+  delay: "{{ healthcheck_delay }}"
+  until: healthcheck_result.status in item.status
+  loop: "{{ healthcheck_targets }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: [healthcheck]

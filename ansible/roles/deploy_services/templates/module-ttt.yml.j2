@@ -4,6 +4,8 @@ services:
     image: {{ module_ttt_image }}:{{ module_ttt_image_tag }}
     container_name: module-ttt
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
     env_file:
       - path: {{ deploy_base_dir }}/config/.env
         required: false
